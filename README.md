@@ -1,7 +1,7 @@
 # Ritolog
 
-## dockerによるVM環境構築手順
+## dockerでvm環境が立ち上がります
 
 ```
-$ docker-compose run web django-admin.py startproject ritolog .
+$ docker-compose up -d
 ```
