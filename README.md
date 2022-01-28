@@ -1,8 +1,26 @@
 # Ritolog
 
-## dockerでvm環境が立ち上がります
+
+上から順番に実行していくとDockerコンテナ内に作られたDjangoが起動します。
+
+
+docker container init
 
 ```
-$ docker-compuse build
-$ docker-compose run web django-admin startproject ritolog
+$ ./bin/container_init.sh
+```
+
+django admin user
+
+```
+$ ./bin/django_create_superuser.sh
+```
+
+docker container start
+
+```
+$ ./bin/container_start.sh
+
+http://localhost:1337
+
 ```
