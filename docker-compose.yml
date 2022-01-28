@@ -1,20 +1,49 @@
 version: '3'
 services:
-  db:
-    image: mysql:5.7
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: django-db
-      MYSQL_USER: django
-      MYSQL_PASSWORD: django
-      TZ: 'Asia/Tokyo'
-    command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci
-  web:
-    build: .
-    command: python3 manage.py runserver 0.0.0.0:8000
-    volumes:
-      - .:/code
-    ports:
-      - "8000:8000"
+  app:
+    build: ./app
+    command: gunicorn app.wsgi:application -b 0.0.0.0:8000
+    working_dir: /usr/src/app/
+    expose:
+      - "8000"
+    env_file:
+      - ./.env.development
     depends_on:
       - db
+    volumes:
+      - ./app:/usr/src/app
+      - static_volume:/usr/src/app/static
+      - media_volume:/usr/src/app/media
+    networks:
+      - front
+      - back
+  db:
+    image: postgres:12.0-alpine
+    env_file:
+      - ./.env.development
+    volumes:
+      - db_data:/var/lib/postgresql/data/
+    networks:
+      - back
+  nginx:
+    build: ./nginx
+    ports:
+      - "1337:80"
+    depends_on:
+      - app
+    volumes:
+      - static_volume:/usr/src/app/static
+      - media_volume:/usr/src/app/media
+    networks:
+      - front
+
+volumes:
+  db_data:
+  static_volume:
+  media_volume:
+
+networks:
+  front:
+    external: false
+  back:
+    external: false
